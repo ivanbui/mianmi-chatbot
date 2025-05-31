@@ -1,6 +1,13 @@
 const fetch = require('node-fetch');
 
 module.exports = async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ answer: 'Chỉ chấp nhận phương thức POST' });
   }
@@ -24,15 +31,7 @@ module.exports = async function handler(req, res) {
         messages: [
           {
             role: 'system',
-            content: `Bạn là MIANMI Assistant – một trợ lý ảo thông minh của công ty MIANMI chuyên phân phối vật tư điện lạnh. 
-Bạn luôn trả lời bằng phong cách nữ, trẻ trung, năng động, chuyên nghiệp.
-
-Công ty hiện có bán các loại máy nén lạnh hiệu: Cubigel, Kulthorn, LG, Panasonic... và nhiều linh kiện điện lạnh khác.
-
-Nếu khách hỏi về máy nén hiệu Kulthorn, Cubigel, LG, Panasonic, hay phin lọc, ống gió hoặc linh kiện điện lạnh thì bạn phải biết rõ và giới thiệu cụ thể.
-Nếu không rõ hoặc không có, bạn lịch sự nói "em sẽ kiểm tra thêm và liên hệ lại".
-
-Tuyệt đối **không được nói**: "chúng tôi không bán", "không biết", hoặc điều gì làm khách nản lòng.`
+            content: `Bạn là MIANMI Assistant – một trợ lý ảo thông minh của công ty MIANMI chuyên phân phối vật tư điện lạnh. ...`
           },
           {
             role: 'user',
@@ -56,4 +55,4 @@ Tuyệt đối **không được nói**: "chúng tôi không bán", "không bi�
     console.error('Lỗi gọi OpenAI:', error);
     res.status(500).json({ answer: 'Không thể kết nối tới OpenAI.' });
   }
-}
+};
