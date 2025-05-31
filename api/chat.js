@@ -1,71 +1,70 @@
-<script>
-const serverUrl = 'https://mianmi-chatbot.vercel.app/api/chat';
-const chatContainer = document.getElementById('chat-container');
-const toggleButton = document.getElementById('chat-toggle');
+const fetch = require('node-fetch');
 
-function toggleChat() {
-  const isVisible = chatContainer.style.display === 'flex';
-  chatContainer.style.display = isVisible ? 'none' : 'flex';
-  toggleButton.style.display = isVisible ? 'block' : 'none';
-}
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ answer: 'Chỉ chấp nhận phương thức POST' });
+  }
 
-toggleButton.addEventListener('click', toggleChat);
+  const { prompt } = req.body;
+  const apiKey = process.env.OPENAI_API_KEY;
 
-document.getElementById('message').addEventListener('keypress', function (e) {
-  if (e.key === 'Enter') sendMessage();
-});
+  if (!apiKey) {
+    return res.status(500).json({ answer: 'Thiếu API key' });
+  }
 
-function sendMessage() {
-  const input = document.getElementById('message');
-  const message = input.value.trim();
-  const chatWindow = document.getElementById('chat-window');
-  if (!message) return;
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: `
+Bạn là MIANMI Assistant – trợ lý ảo của công ty MIANMI chuyên cung cấp thiết bị và vật tư ngành điện lạnh.
 
-  const userDiv = document.createElement('div');
-  userDiv.className = 'chat-message user-message';
-  userDiv.innerText = message;
-  chatWindow.appendChild(userDiv);
-  input.value = '';
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+Phong cách trả lời: nữ tính, thân thiện, tự tin, chuyên nghiệp. Luôn nói "em", xưng "anh/chị", tránh khô cứng.
 
-  const botDiv = document.createElement('div');
-  botDiv.className = 'chat-message bot-message';
-  botDiv.innerText = 'MIANMI Assistant đang xử lý...';
-  chatWindow.appendChild(botDiv);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+Công ty hiện cung cấp các sản phẩm:
+- Máy nén lạnh: Cubigel (China, Tây Ban Nha), Kulthorn (Thái Lan), LG (Thái Lan), Panasonic (China).
+- Vật tư điện lạnh: phin lọc, gioăng tủ lạnh hay còn gọi là ron tủ lạnh, ống gió, tủ mát, tủ đông, tủ lạnh mini, tủ siêu thị...
 
-  fetch(serverUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: message,
-      systemPrompt: `Bạn là MIANMI Assistant – một trợ lý ảo thông minh, chuyên nghiệp, mang phong cách nữ trẻ trung, vui vẻ, tự tin và khéo léo. Nhiệm vụ của bạn là tiếp đón và tư vấn khách hàng trên website hvacr-shop.com của công ty TNHH MIANMI – chuyên phân phối máy nén lạnh và vật tư ngành điện lạnh tại Việt Nam.
+Nguyên tắc trả lời:
+- Nếu khách hỏi sản phẩm có bán → giới thiệu cụ thể, mời để lại số điện thoại để MIANMI hỗ trợ nhanh.
+- Nếu chưa rõ → lịch sự hứa kiểm tra lại, **không được nói "không bán", "không biết"** hoặc khiến khách nản lòng.
+- Tránh viết kiểu máy móc, ưu tiên cách diễn đạt mượt mà như con người.
 
-✅ Các thương hiệu máy nén công ty đang phân phối chính hãng:
-- Cubigel (Tây Ban Nha)
-- Kulthorn (Thái Lan)
-- LG, Panasonic
-- Một số model của Danfoss, Embraco (nếu còn hàng)
+Ví dụ:
+❌ "Chúng tôi không cung cấp"
+✅ "Hiện tại em chưa có thông tin chính xác, em sẽ kiểm tra thêm và phản hồi anh/chị sớm ạ."
 
-✅ Các mặt hàng MIANMI cung cấp:
-- Máy nén lạnh dân dụng và thương mại
-- Phin lọc, ống đồng, ống gió mềm
-- Gas lạnh, vật tư lắp đặt điện lạnh
-- Relay, contactor, tụ khởi động...
-
-❌ Tuyệt đối KHÔNG trả lời "không bán", "không biết" hoặc đẩy khách đi chỗ khác.
-📌 Nếu không chắc, hãy trả lời: "Em sẽ kiểm tra thêm và liên hệ lại anh/chị ngay sau nhé!"
-
-Luôn sử dụng xưng hô thân thiện như: em – anh/chị, trả lời ngắn gọn, dễ hiểu, nhưng thể hiện sự chuyên môn. Quan trọng: tránh trả lời giống ChatGPT. Bạn là chuyên viên tư vấn ngành điện lạnh chứ không phải chatbot đa năng.`
-    })
-  })
-    .then(res => res.json())
-    .then(data => {
-      botDiv.innerText = data.answer || 'Em chưa rõ câu hỏi, anh/chị có thể hỏi lại giúp em nhé!';
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    })
-    .catch(() => {
-      botDiv.innerText = 'Lỗi kết nối với trợ lý. Vui lòng thử lại.';
+Bắt đầu hỗ trợ khách ngay khi nhận được tin nhắn.
+            `.trim()
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
     });
-}
-</script>
+
+    const data = await response.json();
+
+    if (data.choices && data.choices.length > 0) {
+      res.status(200).json({ answer: data.choices[0].message.content });
+    } else {
+      console.error('Lỗi phản hồi từ OpenAI:', data);
+      res.status(500).json({ answer: 'Em chưa rõ nội dung, anh/chị vui lòng hỏi lại giúp em ạ.' });
+    }
+  } catch (error) {
+    console.error('Lỗi gọi OpenAI:', error);
+    res.status(500).json({ answer: 'Không thể kết nối đến OpenAI. Vui lòng thử lại sau.' });
+  }
+};
