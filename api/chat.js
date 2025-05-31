@@ -1,13 +1,17 @@
 const fetch = require('node-fetch');
 
 module.exports = async function handler(req, res) {
+  // Xử lý CORS cho mọi request
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Xử lý preflight request từ browser
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     return res.status(200).end();
   }
 
+  // Chỉ chấp nhận phương thức POST cho thực thi chính
   if (req.method !== 'POST') {
     return res.status(405).json({ answer: 'Chỉ chấp nhận phương thức POST' });
   }
@@ -31,12 +35,9 @@ module.exports = async function handler(req, res) {
         messages: [
           {
             role: 'system',
-            content: `Bạn là MIANMI Assistant – một trợ lý ảo thông minh của công ty MIANMI chuyên phân phối vật tư điện lạnh. ...`
+            content: `Bạn là MIANMI Assistant – trợ lý ảo thông minh, nữ, trẻ trung, nhiệt tình, chuyên tư vấn về máy nén lạnh Cubigel, Kulthorn, LG, Panasonic...`,
           },
-          {
-            role: 'user',
-            content: prompt
-          }
+          { role: 'user', content: prompt }
         ],
         temperature: 0.7,
         max_tokens: 500,
@@ -48,7 +49,7 @@ module.exports = async function handler(req, res) {
     if (data.choices && data.choices.length > 0) {
       res.status(200).json({ answer: data.choices[0].message.content });
     } else {
-      console.error('Lỗi dữ liệu từ OpenAI:', data);
+      console.error('Lỗi từ OpenAI:', data);
       res.status(500).json({ answer: 'Không có phản hồi từ OpenAI.' });
     }
   } catch (error) {
