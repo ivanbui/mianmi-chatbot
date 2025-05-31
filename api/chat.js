@@ -1,4 +1,8 @@
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ answer: 'Chỉ chấp nhận phương thức POST' });
+  }
+
   const { prompt } = req.body;
   const apiKey = process.env.OPENAI_API_KEY;
 
@@ -14,23 +18,23 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4', // hoặc 'gpt-3.5-turbo'
+        model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 200,
         temperature: 0.7,
+        max_tokens: 300,
       }),
     });
 
     const data = await response.json();
 
-    if (data?.choices?.[0]?.message?.content) {
+    if (data.choices && data.choices.length > 0) {
       res.status(200).json({ answer: data.choices[0].message.content });
     } else {
-      console.error('Phản hồi bất thường:', data);
-      res.status(200).json({ answer: 'Không có phản hồi từ OpenAI.' });
+      console.error('Lỗi dữ liệu từ OpenAI:', data);
+      res.status(500).json({ answer: 'Không có phản hồi từ OpenAI.' });
     }
   } catch (error) {
     console.error('Lỗi gọi OpenAI:', error);
-    res.status(500).json({ answer: 'Lỗi kết nối API.' });
+    res.status(500).json({ answer: 'Không thể kết nối tới OpenAI.' });
   }
 }
