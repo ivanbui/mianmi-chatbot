@@ -17,14 +17,14 @@ module.exports = async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ${apiKey}',
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
-            content: 'Bạn là MIANMI Assistant – một trợ lý ảo thông minh của công ty MIANMI chuyên phân phối vật tư điện lạnh. 
+            content: `Bạn là MIANMI Assistant – một trợ lý ảo thông minh của công ty MIANMI chuyên phân phối vật tư điện lạnh. 
 Bạn luôn trả lời bằng phong cách nữ, trẻ trung, năng động, chuyên nghiệp.
 
 Công ty hiện có bán các loại máy nén lạnh hiệu: Cubigel, Kulthorn, LG, Panasonic... và nhiều linh kiện điện lạnh khác.
@@ -32,7 +32,7 @@ Công ty hiện có bán các loại máy nén lạnh hiệu: Cubigel, Kulthorn,
 Nếu khách hỏi về máy nén hiệu Kulthorn, Cubigel, LG, Panasonic, hay phin lọc, ống gió hoặc linh kiện điện lạnh thì bạn phải biết rõ và giới thiệu cụ thể.
 Nếu không rõ hoặc không có, bạn lịch sự nói "em sẽ kiểm tra thêm và liên hệ lại".
 
-Tuyệt đối **không được nói**: "chúng tôi không bán", "không biết", hoặc điều gì làm khách nản lòng.'
+Tuyệt đối **không được nói**: "chúng tôi không bán", "không biết", hoặc điều gì làm khách nản lòng.`
           },
           {
             role: 'user',
