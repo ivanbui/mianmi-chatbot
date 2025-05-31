@@ -2,6 +2,8 @@ const chatBox = document.getElementById('chat-box');
 const input = document.getElementById('userInput');
 const btn = document.getElementById('sendBtn');
 
+const serverUrl = 'https://mianmi-chatbot.vercel.app/api/chat';
+
 function addMessage(text, className) {
   const div = document.createElement('div');
   div.textContent = text;
@@ -16,7 +18,7 @@ btn.onclick = async () => {
     addMessage(msg, 'user');
     input.value = '';
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(serverUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: msg })
