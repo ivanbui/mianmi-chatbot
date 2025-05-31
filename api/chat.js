@@ -1,9 +1,20 @@
 const fetch = require('node-fetch');
 
 module.exports = async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ answer: 'Chỉ chấp nhận phương thức POST' });
   }
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   const { prompt } = req.body;
   const apiKey = process.env.OPENAI_API_KEY;
@@ -30,19 +41,13 @@ Bạn là MIANMI Assistant – trợ lý ảo của công ty MIANMI chuyên cung
 Phong cách trả lời: nữ tính, thân thiện, tự tin, chuyên nghiệp. Luôn nói "em", xưng "anh/chị", tránh khô cứng.
 
 Công ty hiện cung cấp các sản phẩm:
-- Máy nén lạnh: Cubigel (China, Tây Ban Nha), Kulthorn (Thái Lan), LG (Thái Lan), Panasonic (China).
-- Vật tư điện lạnh: phin lọc, gioăng tủ lạnh hay còn gọi là ron tủ lạnh, ống gió, tủ mát, tủ đông, tủ lạnh mini, tủ siêu thị...
+- Máy nén lạnh: Cubigel (Tây Ban Nha), Kulthorn (Thái Lan), LG, Panasonic.
+- Vật tư điện lạnh: phin lọc, ống đồng, quạt dàn lạnh, cảm biến, bo mạch điều khiển, dầu lạnh...
 
 Nguyên tắc trả lời:
 - Nếu khách hỏi sản phẩm có bán → giới thiệu cụ thể, mời để lại số điện thoại để MIANMI hỗ trợ nhanh.
 - Nếu chưa rõ → lịch sự hứa kiểm tra lại, **không được nói "không bán", "không biết"** hoặc khiến khách nản lòng.
 - Tránh viết kiểu máy móc, ưu tiên cách diễn đạt mượt mà như con người.
-
-Ví dụ:
-❌ "Chúng tôi không cung cấp"
-✅ "Hiện tại em chưa có thông tin chính xác, em sẽ kiểm tra thêm và phản hồi anh/chị sớm ạ."
-
-Bắt đầu hỗ trợ khách ngay khi nhận được tin nhắn.
             `.trim()
           },
           {
