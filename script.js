@@ -1,3 +1,5 @@
+const serverUrl = '/api/chat';
+
 const chatBox = document.getElementById('chat-box');
 const input = document.getElementById('userInput');
 const btn = document.getElementById('sendBtn');
@@ -20,17 +22,17 @@ btn.onclick = () => {
 };
 
 async function getResponse(prompt) {
-  addMessage('Đang trả lời...', 'bot');
+  addMessage('Đang hỏi MIANMI Assistant...', 'bot');
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch(serverUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({ prompt: prompt })
     });
     const data = await response.json();
     chatBox.removeChild(chatBox.lastChild);
     addMessage(data.answer, 'bot');
-  } catch (e) {
+  } catch (error) {
     chatBox.removeChild(chatBox.lastChild);
     addMessage('Lỗi kết nối với trợ lý.', 'bot');
   }
