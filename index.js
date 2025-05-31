@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const OPENAI_API_KEY = 'process.env.OPENAI_API_KEY'; // Anh thay bằng API key của anh
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Anh thay bằng API key của anh
 
 app.use(bodyParser.json());
 
